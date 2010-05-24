@@ -74,5 +74,13 @@ int main(int argc, char *argv[]) {
       err(8, "%s", outfile);
     }
   }
+  
+  if (argc == 3 && fclose(in) != 0) {
+    err(9, "%s", argv[1]);
+  }
+  
+  if (fclose(out) != 0) {
+    err(10, "%s", outfile);
+  }
   return 0;
 }
