@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-#define MAX 16384
+#define MAX 32768
 
 int main(int argc, char *argv[]) {
   FILE *in = fopen("a", "r");
