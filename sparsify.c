@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   }
   
   char buffer[MAX];
+  unsigned char seeked = 0;
   
   while (!feof(in)) {
     size_t read = fread(buffer, 1, MAX, in);
@@ -39,13 +40,17 @@ int main(int argc, char *argv[]) {
     unsigned short left = 0, right = 0;
     while (right < read) {
       if (buffer[right] == '\0') {
+        // read a bunch of nulls
         while (buffer[right] == '\0' && right < read) {
           right ++;
         }
+        // seek to the end of the nulls
         if (fseek(out, right-left, SEEK_CUR) != 0) {
           err(5, "%s", outfile);
         }
+        seeked = 1;
       } else {
+        // this appears to be data, copy as much as we can
         while (buffer[right] != '\0' && right < read) {
           right++;
         }
@@ -53,8 +58,20 @@ int main(int argc, char *argv[]) {
         if (ferror(out) != 0) {
           err(6, "%s", outfile);
         }
+        seeked = 0;
       }
       left = right;
+    }
+  }
+  if (seeked != 0) {
+    // rewind by 1 character
+    if(fseek(out, -1, SEEK_CUR) != 0) {
+      err(7, "%s", outfile);
+    }
+    
+    // write one null, to force the file to be the appropriate size
+    if(fputc('\0', out) == EOF) {
+      err(8, "%s", outfile);
     }
   }
   return 0;
