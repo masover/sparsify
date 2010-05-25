@@ -1,0 +1,16 @@
+"Installation": make, then put the binary somewhere in your path.
+
+Reads from a file (or stdin), and writes to a new sparse file, replacing any nulls with actual holes.
+
+Usage: sparsify [infile] <outfile>
+
+If only one argument is provided, it is assumed to be the output file, and input will be read from stdin.
+
+Known issues:
+ - Code is ugly. I don't do C much.
+ - Seems to use a lot more CPU than it should. Increase the buffer size?
+ - Obviously, requires the underlying FS to support sparse files.
+
+Use case: I had a VMWare raw disk image, which I assumed was mostly air, but was preallocated nonetheless (presumably full of nulls). I needed that space back, but I wanted it to still be a "flat" image, so that (hopefully) qemu-img will be able to work with it. After some quick tests with tar -S (which failed miserably), and some searching for similar tools, I hacked this together.
+
+That's about the only place it's appropriate. Examples of places you probably should NOT use this would be the output from a tool like ntfsclone -- it knows how to create sparse files, and if it can't touch the actual file to perform the seeks itself, you should probably use the "special" format anyway.
